@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ApplicationService\Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\NorthwindTraders.Core.Entity\NorthwindTraders.Core.Entity.csproj" />
   </ItemGroup>
 
