@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace NorthwindTraders.Core.Entity
 {
@@ -15,5 +16,6 @@ namespace NorthwindTraders.Core.Entity
         public string Country { get; set; }
         public string Phone { get; set; }
         public string Fax { get; set; }
+        public List<Order> Orders { get; set; }
     }
 }
