@@ -28,7 +28,6 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             RaiseIfLengthWrong("Address", address is null ? 0 : address.Length, 0, 60); 
             RaiseIfLengthWrong("City", city is null ? 0 : city.Length, 0, 15);
             RaiseIfLengthWrong("Region", region is null ? 0 : region.Length, 0, 15);
-
             RaiseIfLengthWrong("Country", country is null ? 0 : country.Length, 0, 15);
             RaiseIfLengthWrong("Fax", fax is null ? 0 : fax.Length, 0, 24);
             RaiseIfLengthWrong("Phone", phone is null ? 0 : phone.Length, 0, 24);
@@ -75,13 +74,14 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             }
         }
 
-        public Customer CreateCustomer(Customer cust)
+        public Customer CreateCustomer(Customer customer)
         {
-            throw new NotImplementedException();
+            return _customerRepository.Create(customer);
         }
 
         public Customer FindCustomerById(string customerId)
         {
+            RaiseIfNullOrWhitespace("Customer ID", customerId);
             return _customerRepository.ReadById(customerId);
         }
 
@@ -93,6 +93,10 @@ namespace NorthwindTraders.Core.ApplicationService.Services
         public Customer UpdateCustomer(Customer customerUpdate)
         {
             var customer = FindCustomerById(customerUpdate.CustomerID);
+            if (customer is null)
+            {
+                throw new Exception($"Customer ID '{customerUpdate.CustomerID}' not found to update");
+            }
             customer.Address = customerUpdate.Address;
             customer.City = customerUpdate.City;
             customer.CompanyName = customerUpdate.CompanyName;
@@ -109,6 +113,10 @@ namespace NorthwindTraders.Core.ApplicationService.Services
 
         public Customer DeleteCustomer(string customerId)
         {
+            if (string.IsNullOrWhiteSpace(customerId))
+            {
+                throw new ArgumentException("Customer ID for delete cannot be null, empty, or whitespace","Customer ID");
+            }
             return _customerRepository.Delete(customerId);
         }
     }

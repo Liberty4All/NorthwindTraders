@@ -6,6 +6,7 @@ using NorthwindTraders.Core.ApplicationService.Services;
 using NorthwindTraders.Core.DomainService;
 using NorthwindTraders.Core.Entity;
 using System;
+using System.Collections.Generic;
 
 namespace NorthwindTraders.Tests
 {
@@ -44,13 +45,13 @@ namespace NorthwindTraders.Tests
             region = "Ohio";
         }
 
+        #region NewCustomer Tests
         [TestMethod]
         [TestCategory("Unit")]
         public void NewCustomer_ValidCustomer_CustomerWithCorrectValues()
         {
             // Arrange
             Initialize();
-            //customerRepository.Setup
 
             // Act
             var result = customerService.NewCustomer(customerID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
@@ -90,7 +91,7 @@ namespace NorthwindTraders.Tests
         {
             // Arrange
             Initialize();
-            customerID = "1234567Foo";
+            customerID = "1234567";
 
             // Act
             Action result = () => customerService.NewCustomer(customerID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
@@ -263,5 +264,215 @@ namespace NorthwindTraders.Tests
             // Assert
             result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Fax must be no more than 24 characters in length\nParameter name: Fax");
         }
+        #endregion
+
+        #region CreateCustomer Tests
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void CreateCustomer_ValidCustomer_NoErrors()
+        {
+            // Arrange
+            Initialize();
+            Customer customer = customerService.NewCustomer(customerID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            customerRepository.Setup(m => m.Create(It.IsAny<Customer>())).Returns(customer);
+
+            // Act
+            var result = customerService.CreateCustomer(customer);
+
+            // Assert
+            result.Should().BeEquivalentTo(customer);
+            customerRepository.Verify(m => m.Create(It.IsAny<Customer>()), Times.Once);
+        }
+        #endregion
+
+        #region FindById Tests
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void FindById_ValidCustomerId_CorrectCustomer()
+        {
+            // Arrange
+            Initialize();
+            Customer customer = customerService.NewCustomer(customerID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            customerRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(customer);
+
+            // Act
+            var result = customerService.FindCustomerById(customer.CustomerID);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(customer);
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void FindById_NonExistentCustomerId_NullCustomer()
+        {
+            // Arrange
+            Initialize();
+            Customer customer = null;
+            customerRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(customer);
+
+            // Act
+            var result = customerService.FindCustomerById("NOPE!");
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void FindById_NullCustomerId_NullArgumentException()
+        {
+            // Arrange
+            Initialize();
+
+            // Act
+            Action result = () => customerService.FindCustomerById(null);
+
+            // Assert
+            result.Should().Throw<ArgumentNullException>().WithMessage("Customer ID cannot be null, empty, or whitespace\nParameter name: Customer ID");
+        }
+        #endregion
+
+        #region GetAllCustomersTests
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void GetAllCustomers_CustomersInRepository_ListOfCustomers()
+        {
+            // Arrange
+            Initialize();
+            IEnumerable<Customer> customers = new List<Customer>()
+            {
+                new Customer()
+                {
+                    Address = "123 Wubba St",
+                    City = "Test One City",
+                    CompanyName = "Test Co One",
+                    ContactName = "Test Contact One",
+                    ContactTitle = "Title One",
+                    Country = "USA",
+                    CustomerID = "ONE01",
+                    Fax = "123-456-7890",
+                    Phone = "123-456-7890",
+                    PostalCode = "44444",
+                    Region = "Region One"
+                },
+                new Customer()
+                {
+                    Address = "123 Two St",
+                    City = "Test Two City",
+                    CompanyName = "Test Co Two",
+                    ContactName = "Test Contact Two",
+                    ContactTitle = "Title Two",
+                    Country = "USA",
+                    CustomerID = "TWO02",
+                    Fax = "123-456-7890",
+                    Phone = "123-456-7890",
+                    PostalCode = "33333",
+                    Region = "Region Two"
+                }
+            };
+            customerRepository.Setup(m => m.ReadAll()).Returns(customers);
+
+            // Act
+            var result = customerService.GetAllCustomers();
+
+            // Assert
+            result.Should().NotBeNullOrEmpty().And.HaveCount(2);
+            result.Should().BeEquivalentTo(customers);
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void GetAllCustomers_NoCustomersInRepository_EmptyListOfCustomers()
+        {
+            // Arrange
+            Initialize();
+            IEnumerable<Customer> customers = new List<Customer>();
+
+            customerRepository.Setup(m => m.ReadAll()).Returns(customers);
+
+            // Act
+            var result = customerService.GetAllCustomers();
+
+            // Assert
+            result.Should().BeEmpty().And.HaveCount(0);
+        }
+        #endregion
+
+        #region UpdateCustomer Tests
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void UpdateCustomer_ValidCustomer_CorrectCustomerReturned()
+        {
+            // Arrange
+            Initialize();
+            Customer updateCustomer = customerService.NewCustomer(customerID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            customerRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(updateCustomer);
+            customerRepository.Setup(m => m.Update(It.IsAny<Customer>())).Returns(updateCustomer);
+
+            // Act
+            var result = customerService.UpdateCustomer(updateCustomer);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(updateCustomer);
+            customerRepository.Verify(m => m.ReadById(It.IsAny<string>()), Times.Once);
+            customerRepository.Verify(m => m.Update(It.IsAny<Customer>()), Times.Once);
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void UpdateCustomer_NonexistentCustomer_CustomerNotFoundError()
+        {
+            // Arrange
+            Initialize();
+            Customer updateCustomer = customerService.NewCustomer(customerID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            customerRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns((Customer)null);
+
+            // Act
+            Action result = () => customerService.UpdateCustomer(updateCustomer);
+
+            // Assert
+            result.Should().Throw<Exception>().WithMessage("Customer ID 'TESTC' not found to update");
+            customerRepository.Verify(m => m.ReadById(It.IsAny<string>()), Times.Once);
+            customerRepository.Verify(m => m.Update(It.IsAny<Customer>()), Times.Never);
+        }
+        #endregion
+
+        #region DeleteCustomer Tests
+        [TestMethod]
+        [TestCategory("Undefined")]
+        public void DeleteCustomer_ValidCustomerID_CorrectCustomerReturned()
+        {
+            // Arrange
+            Initialize();
+            Customer deleteCustomer = customerService.NewCustomer(customerID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            customerRepository.Setup(m => m.Delete(It.IsAny<string>())).Returns(deleteCustomer);
+
+            // Act
+            var result = customerService.DeleteCustomer(deleteCustomer.CustomerID);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(deleteCustomer);
+            customerRepository.Verify(m => m.Delete(It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void DeleteCustomer_InvalidCustomerID_InvalidCustomerIdError()
+        {
+            // Arrange
+            Initialize();
+
+            // Act
+            Action result = () => customerService.DeleteCustomer(null);
+
+            // Assert
+            result.Should().Throw<ArgumentException>().WithMessage("Customer ID for delete cannot be null, empty, or whitespace\nParameter name: Customer ID");
+            customerRepository.Verify(m => m.Delete(It.IsAny<string>()), Times.Never);
+        }
+        #endregion
     }
 }
