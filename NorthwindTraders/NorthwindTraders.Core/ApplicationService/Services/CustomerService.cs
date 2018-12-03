@@ -16,9 +16,63 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             _customerRepository = customerRepository;
         }
 
-        public Customer NewCustomer(string CustomerID, string CompanyName, string ContactName, string ContactTitle, string Address, string City, string Region, string PostalCode, string Country, string Phone, string Fax)
+        public Customer NewCustomer(string customerID, string companyName, string contactName, string contactTitle, string address, string city, string region, string postalCode, string country, string phone, string fax)
         {
-            throw new NotImplementedException();
+            RaiseIfNullOrWhitespace("Customer ID", customerID);
+            RaiseIfLengthWrong("Customer ID", customerID.Length, 5, 5);
+            RaiseIfNullOrWhitespace("Company Name", companyName);
+            RaiseIfLengthWrong("Company Name", companyName.Length, 1, 40);
+
+            RaiseIfLengthWrong("Contact Name", contactName is null ? 0 : contactName.Length, 0, 30);
+            RaiseIfLengthWrong("Contact Title", contactTitle is null ? 0 : contactTitle.Length, 0, 30);
+            RaiseIfLengthWrong("Address", address is null ? 0 : address.Length, 0, 60); 
+            RaiseIfLengthWrong("City", city is null ? 0 : city.Length, 0, 15);
+            RaiseIfLengthWrong("Region", region is null ? 0 : region.Length, 0, 15);
+
+            RaiseIfLengthWrong("Country", country is null ? 0 : country.Length, 0, 15);
+            RaiseIfLengthWrong("Fax", fax is null ? 0 : fax.Length, 0, 24);
+            RaiseIfLengthWrong("Phone", phone is null ? 0 : phone.Length, 0, 24);
+            RaiseIfLengthWrong("Postal Code", postalCode is null ? 0 : postalCode.Length, 0, 10);
+
+            var result = new Customer()
+            {
+                CustomerID = customerID,
+                CompanyName = companyName,
+                ContactName = contactName,
+                ContactTitle = contactTitle,
+                Address = address,
+                City = city,
+                Region = region,
+                PostalCode = postalCode,
+                Country = country,
+                Phone = phone,
+                Fax = fax
+            };
+            return result;
+        }
+
+        private void RaiseIfLengthWrong(string paramName, int paramLength, int minLength, int maxLength)
+        {
+            if (paramLength < minLength || paramLength > maxLength)
+            {
+                if (minLength == maxLength)
+                {
+                    throw new ArgumentOutOfRangeException(paramName, $"{paramName} must be exactly {minLength} characters in length");
+                }
+                if (minLength == 0 && paramLength > maxLength)
+                {
+                    throw new ArgumentOutOfRangeException(paramName, $"{paramName} must be no more than {maxLength} characters in length");
+                }
+                throw new ArgumentOutOfRangeException(paramName, $"{paramName} length must be no less than {minLength} and no more than {maxLength} characters");
+            }
+        }
+
+        private void RaiseIfNullOrWhitespace (string paramName, string paramValue)
+        {
+            if (string.IsNullOrWhiteSpace(paramValue))
+            {
+                throw new ArgumentNullException(paramName, $"{paramName} cannot be null, empty, or whitespace");
+            }
         }
 
         public Customer CreateCustomer(Customer cust)
