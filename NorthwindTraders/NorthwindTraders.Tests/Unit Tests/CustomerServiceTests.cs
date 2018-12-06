@@ -15,6 +15,8 @@ namespace NorthwindTraders.Tests
     {
         private CustomerService customerService;
         private Mock<ICustomerRepository> customerRepository = new Mock<ICustomerRepository>();
+        private OrderService orderService;
+        private Mock<IOrderRepository> orderRepository = new Mock<IOrderRepository>();
         private string address;
         private string city;
         private string companyName;
@@ -31,7 +33,8 @@ namespace NorthwindTraders.Tests
         {
             //var serviceCollection = new ServiceCollection();
             //serviceCollection.AddScoped<ICustomerRepository, CustomerRepository>();
-            customerService = new CustomerService(customerRepository.Object);
+            customerService = new CustomerService(customerRepository.Object,orderRepository.Object);
+            orderService = new OrderService(orderRepository.Object);
             address = "123 Fake St";
             city = "Fake City";
             companyName = "Test Co";
@@ -331,6 +334,42 @@ namespace NorthwindTraders.Tests
 
             // Assert
             result.Should().Throw<ArgumentNullException>().WithMessage("Customer ID cannot be null, empty, or whitespace\nParameter name: Customer ID");
+        }
+
+        [TestMethod]
+        [TestCategory("Undefined")]
+        public void FindByIdIncludeOrders_ValidCustomer_CustomerWithOrders()
+        {
+            // Arrange
+            Initialize();
+            Customer customer = customerService.NewCustomer(customerID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            Shipper shipper = new Shipper() { Id = 1, CompanyName = "FredEx", Phone = "111-111-1111" };
+            Order order = orderService.NewOrder(1,
+                DateTime.Now.AddDays(-1),
+                customer,
+                DateTime.Now.AddDays(10),
+                DateTime.Now,
+                shipper,
+                (decimal)15.65,
+                customer.CompanyName,
+                customer.Address,
+                customer.City,
+                customer.Region,
+                customer.PostalCode,
+                customer.Country,
+                null);
+            List<Order> orders = new List<Order>();
+            orders.Add(order);
+            customer.Orders = orders;
+            customerRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(customer);
+            orderRepository.Setup(m => m.ReadAll()).Returns(orders);
+
+            // Act
+            var result = customerService.FindCustomerByIdIncludingOrders(customer.CustomerID);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(customer);
         }
         #endregion
 

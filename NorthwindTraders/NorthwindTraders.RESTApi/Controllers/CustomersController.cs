@@ -19,24 +19,25 @@ namespace NorthwindTraders.RESTApi.Controllers
             _customerService = customerService;
         }
 
-        // GET api/values
+        // GET api/customers
         [HttpGet]
         public ActionResult<IEnumerable<Customer>> Get()
         {
             return _customerService.GetAllCustomers();
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        // GET api/customers/KEENE
+        [HttpGet("{customerID}")]
+        public ActionResult<Customer> Get(string customerID)
         {
-            return "value";
+            return _customerService.FindCustomerByIdIncludingOrders(customerID);
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody] Customer customer)
         {
+            _customerService.CreateCustomer(customer);
         }
 
         // PUT api/values/5
@@ -46,9 +47,10 @@ namespace NorthwindTraders.RESTApi.Controllers
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{customerID}")]
+        public ActionResult<Customer> Delete(string customerID)
         {
+            return _customerService.DeleteCustomer(customerID);
         }
     }
 }

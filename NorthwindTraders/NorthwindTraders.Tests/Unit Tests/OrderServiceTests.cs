@@ -138,339 +138,352 @@ namespace NorthwindTraders.Tests
             result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Order Date cannot be in the future\nParameter name: Order Date");
         }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_CompanyNameNull_ThrowNullArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    companyName = null;
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void NewOrder_CustomerNull_ThrowNullArgumentError()
+        {
+            // Arrange
+            Initialize();
+            customer = null;
 
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            // Act
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentNullException>().WithMessage("Company Name cannot be null, empty, or whitespace\nParameter name: Company Name");
-        //}
+            // Assert
+            result.Should().Throw<ArgumentNullException>().WithMessage("Customer cannot be null\nParameter name: Order Customer");
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_ContactNameTooLong_ThrowInvalidArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    contactName = "12345678901234567890123456789012345678901234567890";
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void NewOrder_RequireDateBeforeOrderDate_ThrowInvalidArgumentError()
+        {
+            // Arrange
+            Initialize();
+            requiredDate = orderDate.AddDays(-1);
+            string orderDateString = orderDate.ToString("MMMM d, yyyy");
 
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            // Act
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentException>().WithMessage("Contact Name must be no more than 30 characters in length\nParameter name: Contact Name");
-        //}
+            // Assert
+            result.Should().Throw<ArgumentOutOfRangeException>().WithMessage($"Required date cannot be before order date of {orderDateString}\nParameter name: Required Date");
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_ContactTitleTooLong_ThrowInvalidArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    contactTitle = "12345678901234567890123456789012345678901234567890";
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void NewOrder_ShippedDateBeforeOrderDate_ThrowInvalidArgumentError()
+        {
+            // Arrange
+            Initialize();
+            shippedDate = orderDate.AddDays(-1);
+            string orderDateString = orderDate.ToString("MMMM d, yyyy");
 
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            // Act
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentException>().WithMessage("Contact Title must be no more than 30 characters in length\nParameter name: Contact Title");
-        //}
+            // Assert
+            result.Should().Throw<ArgumentOutOfRangeException>().WithMessage($"Shipped date cannot be before order date of {orderDateString}\nParameter name: Shipped Date");
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_AddressTooLong_ThrowInvalidArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    address = "1234567890123456789012345678901234567890123456789012345678901234567890";
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void NewOrder_ShipNameTooLong_ThrowInvalidArgumentError()
+        {
+            // Arrange
+            Initialize();
+            shipName = "12345678901234567890123456789012345678901234567890";
 
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            // Act
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentException>().WithMessage("Address must be no more than 60 characters in length\nParameter name: Address");
-        //}
+            // Assert
+            result.Should().Throw<ArgumentException>().WithMessage("Ship name must be no more than 40 characters in length\nParameter name: Ship Name");
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_CityTooLong_ThrowInvalidArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    city = "12345678901234567890";
+        [TestMethod]
+        [TestCategory("Undefined")]
+        public void NewOrder_ShipAddressTooLong_ThrowInvalidArgumentError()
+        {
+            // Arrange
+            Initialize();
+            shipAddress = "1234567890123456789012345678901234567890123456789012345678901234567890";
 
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            // Act
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentException>().WithMessage("City must be no more than 15 characters in length\nParameter name: City");
-        //}
+            // Assert
+            result.Should().Throw<ArgumentException>().WithMessage("Ship address must be no more than 60 characters in length\nParameter name: Ship Address");
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_RegionTooLong_ThrowInvalidArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    region = "12345678901234567890";
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void NewOrder_ShipCityTooLong_ThrowInvalidArgumentError()
+        {
+            // Arrange
+            Initialize();
+            shipCity = "12345678901234567890";
 
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            // Act
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentException>().WithMessage("Region must be no more than 15 characters in length\nParameter name: Region");
-        //}
+            // Assert
+            result.Should().Throw<ArgumentException>().WithMessage("Ship city must be no more than 15 characters in length\nParameter name: Ship City");
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_PostalCodeTooLong_ThrowInvalidArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    postalCode = "12345678901234567890";
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void NewOrder_RegionTooLong_ThrowInvalidArgumentError()
+        {
+            // Arrange
+            Initialize();
+            shipRegion = "12345678901234567890";
 
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            // Act
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Postal Code must be no more than 10 characters in length\nParameter name: Postal Code");
-        //}
+            // Assert
+            result.Should().Throw<ArgumentException>().WithMessage("Ship region must be no more than 15 characters in length\nParameter name: Ship Region");
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_CountryTooLong_ThrowInvalidArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    country = "12345678901234567890";
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void NewOrder_PostalCodeTooLong_ThrowInvalidArgumentError()
+        {
+            // Arrange
+            Initialize();
+            shipPostalCode = "12345678901234567890";
 
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            // Act
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Country must be no more than 15 characters in length\nParameter name: Country");
-        //}
+            // Assert
+            result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Ship postal code must be no more than 10 characters in length\nParameter name: Ship Postal Code");
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_PhoneTooLong_ThrowInvalidArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    phone = "123456789012345678901234567890";
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void NewOrder_CountryTooLong_ThrowInvalidArgumentError()
+        {
+            // Arrange
+            Initialize();
+            shipCountry = "12345678901234567890";
 
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+            // Act
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Phone must be no more than 24 characters in length\nParameter name: Phone");
-        //}
-
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void NewOrder_FaxTooLong_ThrowInvalidArgumentError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    fax = "123456789012345678901234567890";
-
-        //    // Act
-        //    Action result = () => OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
-
-        //    // Assert
-        //    result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Fax must be no more than 24 characters in length\nParameter name: Fax");
-        //}
+            // Assert
+            result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Ship country must be no more than 15 characters in length\nParameter name: Ship Country");
+        }
         #endregion
 
-        //#region CreateOrder Tests
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void CreateOrder_ValidOrder_NoErrors()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    Order Order = OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
-        //    OrderRepository.Setup(m => m.Create(It.IsAny<Order>())).Returns(Order);
+        #region CreateOrder Tests
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void CreateOrder_ValidOrder_NoErrors()
+        {
+            // Arrange
+            Initialize();
+            Order Order = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            orderRepository.Setup(m => m.Create(It.IsAny<Order>())).Returns(Order);
 
-        //    // Act
-        //    var result = OrderService.CreateOrder(Order);
+            // Act
+            var result = orderService.CreateOrder(Order);
 
-        //    // Assert
-        //    result.Should().BeEquivalentTo(Order);
-        //    OrderRepository.Verify(m => m.Create(It.IsAny<Order>()), Times.Once);
-        //}
-        //#endregion
+            // Assert
+            result.Should().BeEquivalentTo(Order);
+            orderRepository.Verify(m => m.Create(It.IsAny<Order>()), Times.Once);
+        }
+        #endregion
 
-        //#region FindById Tests
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void FindById_ValidOrderId_CorrectOrder()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    Order Order = OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
-        //    OrderRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(Order);
+        #region FindById Tests
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void FindById_ValidOrderId_CorrectOrder()
+        {
+            // Arrange
+            Initialize();
+            Order order = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns(order);
 
-        //    // Act
-        //    var result = OrderService.FindOrderById(Order.OrderID);
+            // Act
+            var result = orderService.FindOrderById(order.Id);
 
-        //    // Assert
-        //    result.Should().NotBeNull();
-        //    result.Should().BeEquivalentTo(Order);
-        //}
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(order);
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void FindById_NonExistentOrderId_NullOrder()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    Order Order = null;
-        //    OrderRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(Order);
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void FindById_NonExistentOrderId_NullOrder()
+        {
+            // Arrange
+            Initialize();
+            Order order = null;
+            orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns(order);
 
-        //    // Act
-        //    var result = OrderService.FindOrderById("NOPE!");
+            // Act
+            var result = orderService.FindOrderById(9999);
 
-        //    // Assert
-        //    result.Should().BeNull();
-        //}
+            // Assert
+            result.Should().BeNull();
+        }
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void FindById_NullOrderId_NullArgumentException()
-        //{
-        //    // Arrange
-        //    Initialize();
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void FindById_NegativeOrderId_NullArgumentException()
+        {
+            // Arrange
+            Initialize();
 
-        //    // Act
-        //    Action result = () => OrderService.FindOrderById(null);
+            // Act
+            Action result = () => orderService.FindOrderById(-1);
 
-        //    // Assert
-        //    result.Should().Throw<ArgumentNullException>().WithMessage("Order ID cannot be null, empty, or whitespace\nParameter name: Order ID");
-        //}
-        //#endregion
+            // Assert
+            result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Order ID cannot be less than 0\nParameter name: Order ID");
+        }
+        #endregion
 
-        //#region GetAllOrdersTests
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void GetAllOrders_OrdersInRepository_ListOfOrders()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    IEnumerable<Order> Orders = new List<Order>()
-        //    {
-        //        new Order()
-        //        {
-        //            Address = "123 Wubba St",
-        //            City = "Test One City",
-        //            CompanyName = "Test Co One",
-        //            ContactName = "Test Contact One",
-        //            ContactTitle = "Title One",
-        //            Country = "USA",
-        //            OrderID = "ONE01",
-        //            Fax = "123-456-7890",
-        //            Phone = "123-456-7890",
-        //            PostalCode = "44444",
-        //            Region = "Region One"
-        //        },
-        //        new Order()
-        //        {
-        //            Address = "123 Two St",
-        //            City = "Test Two City",
-        //            CompanyName = "Test Co Two",
-        //            ContactName = "Test Contact Two",
-        //            ContactTitle = "Title Two",
-        //            Country = "USA",
-        //            OrderID = "TWO02",
-        //            Fax = "123-456-7890",
-        //            Phone = "123-456-7890",
-        //            PostalCode = "33333",
-        //            Region = "Region Two"
-        //        }
-        //    };
-        //    OrderRepository.Setup(m => m.ReadAll()).Returns(Orders);
+        #region GetAllOrdersTests
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void GetAllOrders_OrdersInRepository_ListOfOrders()
+        {
+            // Arrange
+            Initialize();
+            IEnumerable<Order> Orders = new List<Order>()
+            {
+                new Order()
+                {
+                    Customer = customer,
+                    Employee = employee,
+                    Freight = freight,
+                    Id = 1,
+                    OrderDate = orderDate,
+                    RequiredDate = requiredDate,
+                    ShipAddress = shipAddress,
+                    ShipCity = shipCity,
+                    ShipCountry = shipCountry,
+                    ShipName = shipName,
+                    ShippedDate = shippedDate,
+                    Shipper = shipper,
+                    ShipPostalCode = shipPostalCode,
+                    ShipRegion = shipRegion
+                },
+                new Order()
+                {
+                    Customer = customer,
+                    Employee = employee,
+                    Freight = freight,
+                    Id = 2,
+                    OrderDate = orderDate,
+                    RequiredDate = requiredDate,
+                    ShipAddress = shipAddress,
+                    ShipCity = shipCity,
+                    ShipCountry = shipCountry,
+                    ShipName = shipName,
+                    ShippedDate = shippedDate,
+                    Shipper = shipper,
+                    ShipPostalCode = shipPostalCode,
+                    ShipRegion = shipRegion
 
-        //    // Act
-        //    var result = OrderService.GetAllOrders();
+                }
+            };
+            orderRepository.Setup(m => m.ReadAll()).Returns(Orders);
 
-        //    // Assert
-        //    result.Should().NotBeNullOrEmpty().And.HaveCount(2);
-        //    result.Should().BeEquivalentTo(Orders);
-        //}
+            // Act
+            var result = orderService.GetAllOrders();
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void GetAllOrders_NoOrdersInRepository_EmptyListOfOrders()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    IEnumerable<Order> Orders = new List<Order>();
+            // Assert
+            result.Should().NotBeNullOrEmpty().And.HaveCount(2);
+            result.Should().BeEquivalentTo(Orders);
+        }
 
-        //    OrderRepository.Setup(m => m.ReadAll()).Returns(Orders);
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void GetAllOrders_NoOrdersInRepository_EmptyListOfOrders()
+        {
+            // Arrange
+            Initialize();
+            IEnumerable<Order> orders = new List<Order>();
 
-        //    // Act
-        //    var result = OrderService.GetAllOrders();
+            orderRepository.Setup(m => m.ReadAll()).Returns(orders);
 
-        //    // Assert
-        //    result.Should().BeEmpty().And.HaveCount(0);
-        //}
-        //#endregion
+            // Act
+            var result = orderService.GetAllOrders();
 
-        //#region UpdateOrder Tests
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void UpdateOrder_ValidOrder_CorrectOrderReturned()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    Order updateOrder = OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
-        //    OrderRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(updateOrder);
-        //    OrderRepository.Setup(m => m.Update(It.IsAny<Order>())).Returns(updateOrder);
+            // Assert
+            result.Should().BeEmpty().And.HaveCount(0);
+        }
+        #endregion
 
-        //    // Act
-        //    var result = OrderService.UpdateOrder(updateOrder);
+        #region UpdateOrder Tests
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void UpdateOrder_ValidOrder_CorrectOrderReturned()
+        {
+            // Arrange
+            Initialize();
+            Order updateOrder = orderService.NewOrder(9999, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns(updateOrder);
+            orderRepository.Setup(m => m.Update(It.IsAny<Order>())).Returns(updateOrder);
 
-        //    // Assert
-        //    result.Should().NotBeNull();
-        //    result.Should().BeEquivalentTo(updateOrder);
-        //    OrderRepository.Verify(m => m.ReadById(It.IsAny<string>()), Times.Once);
-        //    OrderRepository.Verify(m => m.Update(It.IsAny<Order>()), Times.Once);
-        //}
+            // Act
+            var result = orderService.UpdateOrder(updateOrder);
 
-        //[TestMethod]
-        //[TestCategory("Unit")]
-        //public void UpdateOrder_NonexistentOrder_OrderNotFoundError()
-        //{
-        //    // Arrange
-        //    Initialize();
-        //    Order updateOrder = OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
-        //    OrderRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns((Order)null);
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(updateOrder);
+            orderRepository.Verify(m => m.ReadById(It.IsAny<int>()), Times.Once);
+            orderRepository.Verify(m => m.Update(It.IsAny<Order>()), Times.Once);
+        }
 
-        //    // Act
-        //    Action result = () => OrderService.UpdateOrder(updateOrder);
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void UpdateOrder_NonexistentOrder_OrderNotFoundError()
+        {
+            // Arrange
+            Initialize();
+            Id = 99;
+            Order updateOrder = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns((Order)null);
 
-        //    // Assert
-        //    result.Should().Throw<Exception>().WithMessage("Order ID 'TESTC' not found to update");
-        //    OrderRepository.Verify(m => m.ReadById(It.IsAny<string>()), Times.Once);
-        //    OrderRepository.Verify(m => m.Update(It.IsAny<Order>()), Times.Never);
-        //}
-        //#endregion
+            // Act
+            Action result = () => orderService.UpdateOrder(updateOrder);
 
-        //#region DeleteOrder Tests
+            // Assert
+            result.Should().Throw<Exception>().WithMessage($"Order ID '{Id}' not found to update");
+            orderRepository.Verify(m => m.ReadById(It.IsAny<int>()), Times.Once);
+            orderRepository.Verify(m => m.Update(It.IsAny<Order>()), Times.Never);
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void UpdateOrder_OrderIDLessThanOne_ArgumentOutOfRangeError()
+        {
+            // Arrange
+            Initialize();
+            Order updateOrder = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns((Order)null);
+
+            // Act
+            Action result = () => orderService.UpdateOrder(updateOrder);
+
+            // Assert
+            result.Should().Throw<Exception>().WithMessage("Order ID cannot be less than 1\nParameter name: Order ID");
+            orderRepository.Verify(m => m.ReadById(It.IsAny<int>()), Times.Never);
+            orderRepository.Verify(m => m.Update(It.IsAny<Order>()), Times.Never);
+        }
+        #endregion
+
+        #region DeleteOrder Tests
         //[TestMethod]
         //[TestCategory("Undefined")]
         //public void DeleteOrder_ValidOrderID_CorrectOrderReturned()
         //{
         //    // Arrange
         //    Initialize();
-        //    Order deleteOrder = OrderService.NewOrder(OrderID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+        //    Order deleteOrder = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
         //    OrderRepository.Setup(m => m.Delete(It.IsAny<string>())).Returns(deleteOrder);
 
         //    // Act
@@ -496,6 +509,6 @@ namespace NorthwindTraders.Tests
         //    result.Should().Throw<ArgumentException>().WithMessage("Order ID for delete cannot be null, empty, or whitespace\nParameter name: Order ID");
         //    OrderRepository.Verify(m => m.Delete(It.IsAny<string>()), Times.Never);
         //}
-        //#endregion
+        #endregion
     }
 }

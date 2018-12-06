@@ -10,10 +10,12 @@ namespace NorthwindTraders.Core.ApplicationService.Services
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly IOrderRepository _orderRepository;
 
-        public CustomerService(ICustomerRepository customerRepository)
+        public CustomerService(ICustomerRepository customerRepository, IOrderRepository orderRepository)
         {
             _customerRepository = customerRepository;
+            _orderRepository = orderRepository;
         }
 
         public Customer NewCustomer(string customerID, string companyName, string contactName, string contactTitle, string address, string city, string region, string postalCode, string country, string phone, string fax)
@@ -85,6 +87,12 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             return _customerRepository.ReadById(customerId);
         }
 
+        public Customer FindCustomerByIdIncludingOrders(string customerId)
+        {
+            var customer = _customerRepository.ReadByIdIncludeOrders(customerId);
+            return customer;
+        }
+
         public List<Customer> GetAllCustomers()
         {
             return _customerRepository.ReadAll().ToList();
@@ -119,5 +127,6 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             }
             return _customerRepository.Delete(customerId);
         }
+
     }
 }

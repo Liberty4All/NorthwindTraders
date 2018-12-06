@@ -13,7 +13,7 @@ namespace NorthwindTraders.Core.ApplicationService
             DateTime RequiredDate,
             DateTime ShippedDate,
             Shipper Shipper,
-            double Freight,
+            decimal Freight,
             string ShipName,
             string ShipAddress,
             string ShipCity,
