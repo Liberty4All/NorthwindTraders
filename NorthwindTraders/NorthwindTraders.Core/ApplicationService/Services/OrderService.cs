@@ -144,25 +144,25 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             {
                 throw new ArgumentOutOfRangeException("Order ID", "Order ID cannot be less than 1");
             }
-            var order = FindOrderById(orderUpdate.OrderId);
-            if (order is null)
-            {
-                throw new Exception($"Order ID '{orderUpdate.OrderId}' not found to update");
-            }
-            order.Customer = orderUpdate.Customer;
-            order.Employee = orderUpdate.Employee;
-            order.Freight = orderUpdate.Freight;
-            order.OrderId = orderUpdate.OrderId;
-            order.OrderDate = orderUpdate.OrderDate;
-            order.RequiredDate = orderUpdate.RequiredDate;
-            order.ShipAddress = orderUpdate.ShipAddress;
-            order.ShipCity = orderUpdate.ShipCity;
-            order.ShipCountry = orderUpdate.ShipCountry;
-            order.ShipName = orderUpdate.ShipName;
-            order.ShippedDate = orderUpdate.ShippedDate;
-            order.ShipVia = orderUpdate.ShipVia;
-            order.ShipPostalCode = orderUpdate.ShipPostalCode;
-            order.ShipRegion = orderUpdate.ShipRegion;
+            //var order = FindOrderById(orderUpdate.OrderId);
+            //if (order is null)
+            //{
+            //    throw new Exception($"Order ID '{orderUpdate.OrderId}' not found to update");
+            //}
+            //order.Customer = orderUpdate.Customer;
+            //order.Employee = orderUpdate.Employee;
+            //order.Freight = orderUpdate.Freight;
+            //order.OrderId = orderUpdate.OrderId;
+            //order.OrderDate = orderUpdate.OrderDate;
+            //order.RequiredDate = orderUpdate.RequiredDate;
+            //order.ShipAddress = orderUpdate.ShipAddress;
+            //order.ShipCity = orderUpdate.ShipCity;
+            //order.ShipCountry = orderUpdate.ShipCountry;
+            //order.ShipName = orderUpdate.ShipName;
+            //order.ShippedDate = orderUpdate.ShippedDate;
+            //order.ShipVia = orderUpdate.ShipVia;
+            //order.ShipPostalCode = orderUpdate.ShipPostalCode;
+            //order.ShipRegion = orderUpdate.ShipRegion;
             return _orderRepository.Update(orderUpdate);
         }
     }

@@ -32,14 +32,21 @@ namespace NorthwindTraders.RESTApi.Controllers
 
         // POST: api/Orders
         [HttpPost]
-        public void Post([FromBody] string value)
+        public ActionResult<Order> Post([FromBody] Order order)
         {
+            return _orderService.CreateOrder(order);
         }
 
         // PUT: api/Orders/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public ActionResult<Order> Put(int id, [FromBody] Order order)
         {
+            if (id < 1 || id != order.OrderId)
+            {
+                return BadRequest("Parameter Id and order ID must be the same");
+            }
+
+            return Ok(_orderService.UpdateOrder(order));
         }
 
         // DELETE: api/ApiWithActions/5

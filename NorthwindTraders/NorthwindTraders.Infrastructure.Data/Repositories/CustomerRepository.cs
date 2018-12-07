@@ -46,7 +46,16 @@ namespace NorthwindTraders.Infrastructure.Data.Repositories
 
         public Customer Update(Customer customerUpdate)
         {
-            throw new NotImplementedException();
+    //        if (orderUpdate.Customer != null &&
+    //_context.ChangeTracker.Entries<Customer>()
+    //.FirstOrDefault(ce => ce.Entity.CustomerID == orderUpdate.Customer.CustomerID) == null)
+    //        {
+    //            _context.Attach(orderUpdate.Customer);
+    //        }
+            var updated = _context.Update(customerUpdate).Entity;
+            _context.SaveChanges();
+            return updated;
+
         }
 
         public Customer Delete(string customerId)

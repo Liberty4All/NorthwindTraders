@@ -18,19 +18,15 @@ namespace NorthwindTraders.Infrastructure.Data.Repositories
         }
         public Order Create(Order order)
         {
-            var result = _context.Orders.Add(order).Entity;
-            _context.SaveChanges();
-            return result;
-        }
-
-        public Order Delete(int orderId)
-        {
-            var result = ReadById(orderId);
-            if (result != null)
+            if (order.Customer != null &&
+                _context.ChangeTracker.Entries<Customer>()
+                .FirstOrDefault(ce => ce.Entity.CustomerID == order.Customer.CustomerID) == null)
             {
-                return _context.Orders.Remove(result).Entity;
+                _context.Attach(order.Customer); 
             }
-            return null;
+            var saved = _context.Orders.Add(order).Entity;
+            _context.SaveChanges();
+            return saved;
         }
 
         public IEnumerable<Order> ReadAll()
@@ -47,7 +43,22 @@ namespace NorthwindTraders.Infrastructure.Data.Repositories
 
         public Order Update(Order orderUpdate)
         {
-            throw new NotImplementedException();
+            if (orderUpdate.Customer != null &&
+                _context.ChangeTracker.Entries<Customer>()
+                .FirstOrDefault(ce => ce.Entity.CustomerID == orderUpdate.Customer.CustomerID) == null)
+            {
+                _context.Attach(orderUpdate.Customer);
+            }
+            var updated = _context.Update(orderUpdate).Entity;
+            _context.SaveChanges();
+            return updated;
+        }
+
+        public Order Delete(int orderId)
+        {
+            var result = _context.Remove(new Order { OrderId = orderId }).Entity;
+            _context.SaveChanges();
+            return result;
         }
     }
 }
