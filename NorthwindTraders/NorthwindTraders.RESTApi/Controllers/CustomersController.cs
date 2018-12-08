@@ -23,21 +23,61 @@ namespace NorthwindTraders.RESTApi.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Customer>> Get()
         {
-            return _customerService.GetAllCustomers();
+            List<Customer> fetchCustomers;
+            try
+            {
+                fetchCustomers = _customerService.GetAllCustomers();
+                if (fetchCustomers is null)
+                {
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return fetchCustomers;
         }
 
         // GET api/customers/KEENE
         [HttpGet("{customerID}")]
         public ActionResult<Customer> Get(string customerID)
         {
-            return _customerService.FindCustomerByIdIncludingOrders(customerID);
+            Customer fetchCustomer;
+            try
+            {
+                fetchCustomer = _customerService.FindCustomerByIdIncludingOrders(customerID);
+                if (fetchCustomer is null)
+                {
+                    return NotFound(customerID);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return fetchCustomer;
         }
 
         // POST api/customers
         [HttpPost]
         public ActionResult<Customer> Post([FromBody] Customer customer)
         {
-            return _customerService.CreateCustomer(customer);
+            Customer createdCustomer;
+            if (string.IsNullOrWhiteSpace(customer.ContactName))
+            {
+                return BadRequest("Company Name is required for creating a Customer");
+            }
+
+            try
+            {
+                createdCustomer = _customerService.CreateCustomer(customer);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Created($"/api/customers/{createdCustomer.CustomerID}", createdCustomer);
         }
 
         // PUT api/customers/KEENE
@@ -72,7 +112,7 @@ namespace NorthwindTraders.RESTApi.Controllers
                 customerID.Length != 5);
         }
 
-        // DELETE api/values/5
+        // DELETE api/customers/5
         [HttpDelete("{customerID}")]
         public ActionResult<Customer> Delete(string customerID)
         {
