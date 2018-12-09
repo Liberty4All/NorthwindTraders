@@ -27,7 +27,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
 
             RaiseIfLengthWrong("Contact Name", contactName is null ? 0 : contactName.Length, 0, 30);
             RaiseIfLengthWrong("Contact Title", contactTitle is null ? 0 : contactTitle.Length, 0, 30);
-            RaiseIfLengthWrong("Address", address is null ? 0 : address.Length, 0, 60); 
+            RaiseIfLengthWrong("Address", address is null ? 0 : address.Length, 0, 60);
             RaiseIfLengthWrong("City", city is null ? 0 : city.Length, 0, 15);
             RaiseIfLengthWrong("Region", region is null ? 0 : region.Length, 0, 15);
             RaiseIfLengthWrong("Country", country is null ? 0 : country.Length, 0, 15);
@@ -50,6 +50,14 @@ namespace NorthwindTraders.Core.ApplicationService.Services
                 Fax = fax
             };
             return result;
+        }
+
+        private void RaiseIfCustomerIDExists(string customerID)
+        {
+            if (_customerRepository.ReadById(customerID) != null)
+            {
+                throw new ArgumentException($"Customer ID: {customerID} already exists in database", "Customer ID");
+            }
         }
 
         private void RaiseIfLengthWrong(string paramName, int paramLength, int minLength, int maxLength)
@@ -78,19 +86,42 @@ namespace NorthwindTraders.Core.ApplicationService.Services
 
         public Customer CreateCustomer(Customer customer)
         {
+            RaiseIfCustomerIDExists(customer.CustomerID);
+            Customer newCustomer = NewCustomer(
+                customer.CustomerID,
+                customer.CompanyName,
+                customer.ContactName,
+                customer.ContactTitle,
+                customer.Address,
+                customer.City,
+                customer.Region,
+                customer.PostalCode,
+                customer.Country,
+                customer.Phone,
+                customer.Fax);
             return _customerRepository.Create(customer);
         }
 
         public Customer FindCustomerById(string customerId)
         {
             RaiseIfNullOrWhitespace("Customer ID", customerId);
-            return _customerRepository.ReadById(customerId);
+            Customer fetchCustomer = _customerRepository.ReadById(customerId);
+            if (fetchCustomer is null)
+            {
+                throw new NotFoundException($"Could not find Customer ID: {customerId}");
+            }
+            return fetchCustomer;
         }
 
         public Customer FindCustomerByIdIncludingOrders(string customerId)
         {
-            var customer = _customerRepository.ReadByIdIncludeOrders(customerId);
-            return customer;
+            RaiseIfNullOrWhitespace("Customer ID", customerId);
+            Customer fetchCustomer = _customerRepository.ReadByIdIncludeOrders(customerId);
+            if (fetchCustomer is null)
+            {
+                throw new NotFoundException($"Could not find Customer ID: {customerId}");
+            }
+            return fetchCustomer;
         }
 
         public List<Customer> GetAllCustomers()
@@ -100,30 +131,33 @@ namespace NorthwindTraders.Core.ApplicationService.Services
 
         public Customer UpdateCustomer(Customer customerUpdate)
         {
-            var customer = FindCustomerById(customerUpdate.CustomerID);
-            if (customer is null)
+            if (FindCustomerById(customerUpdate.CustomerID) is null)
             {
-                throw new Exception($"Customer ID '{customerUpdate.CustomerID}' not found to update");
+                throw new ArgumentException($"Customer ID '{customerUpdate.CustomerID}' not found to update","CustomerID");
             }
-            customer.Address = customerUpdate.Address;
-            customer.City = customerUpdate.City;
-            customer.CompanyName = customerUpdate.CompanyName;
-            customer.ContactName = customerUpdate.ContactName;
-            customer.ContactTitle = customerUpdate.ContactTitle;
-            customer.Country = customerUpdate.Country;
-            customer.CustomerID = customerUpdate.CustomerID;
-            customer.Fax = customerUpdate.Fax;
-            customer.Phone = customerUpdate.Phone;
-            customer.PostalCode = customerUpdate.PostalCode;
-            customer.Region = customerUpdate.Region;
+
+            Customer customer = NewCustomer(
+                customerUpdate.CustomerID,
+                customerUpdate.CompanyName,
+                customerUpdate.ContactName,
+                customerUpdate.ContactTitle,
+                customerUpdate.Address,
+                customerUpdate.City,
+                customerUpdate.Region,
+                customerUpdate.PostalCode,
+                customerUpdate.Country,
+                customerUpdate.Phone,
+                customerUpdate.Fax);
             return _customerRepository.Update(customer);
         }
 
         public Customer DeleteCustomer(string customerId)
         {
-            if (string.IsNullOrWhiteSpace(customerId))
+            RaiseIfNullOrWhitespace("Customer ID", customerId);
+            RaiseIfLengthWrong("Customer ID", customerId.Length, 5, 5);
+            if (_customerRepository.ReadById(customerId) == null)
             {
-                throw new ArgumentException("Customer ID for delete cannot be null, empty, or whitespace","Customer ID");
+                throw new NotFoundException($"Customer ID: {customerId} not found to delete");
             }
             return _customerRepository.Delete(customerId);
         }

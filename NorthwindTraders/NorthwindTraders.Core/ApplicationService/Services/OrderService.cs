@@ -16,34 +16,12 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             _orderRepository = orderRepository;
         }
 
-        public Order CreateOrder(Order order)
-        {
-            return _orderRepository.Create(order);
-        }
-
-        public Order DeleteOrder(int id)
-        {
-            RaiseIfNegative("Order ID", id);
-            return _orderRepository.Delete(id);
-        }
-
-        public Order FindOrderById(int orderId)
-        {
-            RaiseIfNegative("Order ID", orderId);
-            return _orderRepository.ReadById(orderId);
-        }
-
-        public List<Order> GetAllOrders()
-        {
-            return _orderRepository.ReadAll().ToList();
-        }
-
         public Order NewOrder(int id,
                               DateTime orderDate,
                               Customer customer,
                               DateTime requiredDate,
                               DateTime shippedDate,
-                              Shipper shipper,
+                              int shipVia,
                               decimal freight,
                               string shipName,
                               string shipAddress,
@@ -53,7 +31,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
                               string shipCountry,
                               Employee employee)
         {
-            RaiseIfNegative("Order ID", id);
+            RaiseIfLessThanOne("Order ID", id);
             RaiseIfDateTooOld("Order Date", orderDate, string.Empty, new DateTime(1996, 1, 1));
             RaiseIfDateInTheFuture("Order Date", orderDate);
             RaiseIfNull(customer);
@@ -65,6 +43,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             RaiseIfLengthWrong("Ship Region", shipRegion.Length, 0, 15);
             RaiseIfLengthWrong("Ship Postal Code", shipPostalCode.Length, 0, 10);
             RaiseIfLengthWrong("Ship Country", shipCountry.Length, 0, 15);
+            RaiseIfMissingOrInvalid(customer.CustomerID);
 
             var result = new Order()
             {
@@ -84,6 +63,86 @@ namespace NorthwindTraders.Core.ApplicationService.Services
                 ShipRegion = shipRegion
             };
             return result;
+        }
+
+        public Order CreateOrder(Order order)
+        {
+            Order newOrder = NewOrder(
+                order.OrderId,
+                order.OrderDate,
+                order.Customer,
+                order.RequiredDate,
+                order.ShippedDate.GetValueOrDefault(DateTime.MinValue),
+                order.ShipVia,
+                order.Freight,
+                order.ShipName,
+                order.ShipAddress,
+                order.ShipCity,
+                order.ShipRegion,
+                order.ShipPostalCode,
+                order.ShipCountry,
+                order.Employee);
+            return _orderRepository.Create(order);
+        }
+
+        public Order FindOrderById(int orderId)
+        {
+            RaiseIfLessThanOne("Order ID", orderId);
+            Order fetchOrder = _orderRepository.ReadById(orderId);
+            if (fetchOrder == null)
+            {
+                throw new NotFoundException($"Could not find Order ID: {orderId}");
+            }
+            return fetchOrder;
+        }
+
+        public List<Order> GetAllOrders()
+        {
+            return _orderRepository.ReadAll().ToList();
+        }
+
+        public Order UpdateOrder(Order orderUpdate)
+        {
+            if (FindOrderById(orderUpdate.OrderId) is null)
+            {
+                throw new NotFoundException($"Order ID: {orderUpdate.OrderId} not found to update");
+            }
+
+            Order order = NewOrder(
+                orderUpdate.OrderId,
+                orderUpdate.OrderDate,
+                orderUpdate.Customer,
+                orderUpdate.RequiredDate,
+                orderUpdate.ShippedDate.GetValueOrDefault(DateTime.MinValue),
+                orderUpdate.ShipVia,
+                orderUpdate.Freight,
+                orderUpdate.ShipName,
+                orderUpdate.ShipAddress,
+                orderUpdate.ShipCity,
+                orderUpdate.ShipRegion,
+                orderUpdate.ShipPostalCode,
+                orderUpdate.ShipCountry,
+                orderUpdate.Employee);
+            return _orderRepository.Update(orderUpdate);
+        }
+
+        public Order DeleteOrder(int id)
+        {
+            RaiseIfLessThanOne("Order ID", id);
+            if (_orderRepository.ReadById(id) is null)
+            {
+                throw new NotFoundException($"Order ID: {id} not found to delete");
+            }
+            return _orderRepository.Delete(id);
+        }
+
+        private void RaiseIfMissingOrInvalid(string customerID)
+        {
+            if (string.IsNullOrEmpty(customerID) ||
+                customerID.Length != 5)
+            {
+                throw new ArgumentException("Order must have a valid Customer ID (exactly 5 characters)");
+            }
         }
 
         private void RaiseIfLengthWrong(string paramName, int paramLength, int minLength, int maxLength)
@@ -130,40 +189,12 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             }
         }
 
-        private void RaiseIfNegative(string paramName, int paramValue)
+        private void RaiseIfLessThanOne(string paramName, int paramValue)
         {
-            if (paramValue < 0)
+            if (paramValue < 1)
             {
-                throw new ArgumentOutOfRangeException(paramName, $"{paramName} cannot be less than 0");
+                throw new ArgumentOutOfRangeException(paramName, $"{paramName} cannot be less than 1");
             }
-        }
-
-        public Order UpdateOrder(Order orderUpdate)
-        {
-            if (orderUpdate.OrderId < 1)
-            {
-                throw new ArgumentOutOfRangeException("Order ID", "Order ID cannot be less than 1");
-            }
-            //var order = FindOrderById(orderUpdate.OrderId);
-            //if (order is null)
-            //{
-            //    throw new Exception($"Order ID '{orderUpdate.OrderId}' not found to update");
-            //}
-            //order.Customer = orderUpdate.Customer;
-            //order.Employee = orderUpdate.Employee;
-            //order.Freight = orderUpdate.Freight;
-            //order.OrderId = orderUpdate.OrderId;
-            //order.OrderDate = orderUpdate.OrderDate;
-            //order.RequiredDate = orderUpdate.RequiredDate;
-            //order.ShipAddress = orderUpdate.ShipAddress;
-            //order.ShipCity = orderUpdate.ShipCity;
-            //order.ShipCountry = orderUpdate.ShipCountry;
-            //order.ShipName = orderUpdate.ShipName;
-            //order.ShippedDate = orderUpdate.ShippedDate;
-            //order.ShipVia = orderUpdate.ShipVia;
-            //order.ShipPostalCode = orderUpdate.ShipPostalCode;
-            //order.ShipRegion = orderUpdate.ShipRegion;
-            return _orderRepository.Update(orderUpdate);
         }
     }
 }

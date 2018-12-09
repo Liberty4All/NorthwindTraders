@@ -24,7 +24,6 @@ namespace NorthwindTraders.Infrastructure.Data.Repositories
             return result;
         }
 
-
         public IEnumerable<Customer> ReadAll()
         {
             return _context.Customers;

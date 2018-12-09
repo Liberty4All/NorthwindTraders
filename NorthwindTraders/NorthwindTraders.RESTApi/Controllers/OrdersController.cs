@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NorthwindTraders.Core;
 using NorthwindTraders.Core.ApplicationService;
 using NorthwindTraders.Core.Entity;
 using System;
@@ -35,7 +36,7 @@ namespace NorthwindTraders.RESTApi.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            return fetchOrders;
+            return Ok(fetchOrders);
         }
 
         // GET: api/Orders/5
@@ -65,10 +66,6 @@ namespace NorthwindTraders.RESTApi.Controllers
         {
             Order createdOrder;
 
-            if (MissingOrInvalid(order.Customer.CustomerID))
-            {
-                return BadRequest("Order must have a valid Customer ID (exactly 5 characters)");
-            }
             try
             {
                 createdOrder = _orderService.CreateOrder(order);
@@ -80,43 +77,40 @@ namespace NorthwindTraders.RESTApi.Controllers
             return Created($"/api/orders/{createdOrder.OrderId}",createdOrder);
         }
 
-        private bool MissingOrInvalid(string customerID)
-        {
-            if (string.IsNullOrEmpty(customerID))
-            {
-                return true;
-            }
-
-            if (customerID.Length != 5)
-            {
-                return true;
-            }
-            return false;
-        }
-
         // PUT: api/Orders/5
         [HttpPut("{id}")]
         public ActionResult<Order> Put(int id, [FromBody] Order order)
         {
-            if (id < 1 || id != order.OrderId)
+            try
             {
-                return BadRequest("Parameter Id and order ID must be the same");
-            }
+                if (id != order.OrderId)
+                {
+                    throw new ArgumentException("Parameter Id and order ID must be the same");
+                }
 
-            return Ok(_orderService.UpdateOrder(order));
+                return Ok(_orderService.UpdateOrder(order));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE: api/Orders/5
         [HttpDelete("{id}")]
         public ActionResult<Order> Delete(int id)
         {
-            if (id < 1)
-            {
-                return BadRequest("Order ID parameter must be greater than zero");
-            }
             try
             {
                 return Ok(_orderService.DeleteOrder(id));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
