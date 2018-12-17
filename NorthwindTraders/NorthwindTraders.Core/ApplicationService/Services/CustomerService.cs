@@ -129,6 +129,25 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             return _customerRepository.ReadAll().ToList();
         }
 
+        public List<Customer> GetFilteredCustomers(Filter filter)
+        {
+            RaiseIfNegative("Current Page", filter.CurrentPage);
+            RaiseIfNegative("ItemsPerPage", filter.ItemsPerPage);
+            if (((filter.CurrentPage - 1) * filter.ItemsPerPage) >= _customerRepository.Count())
+            {
+                throw new System.IO.InvalidDataException("Index out of bounds, CurrentPage is too high");
+            }
+            return _customerRepository.ReadAll(filter).ToList();
+        }
+
+        private void RaiseIfNegative(string paramName, int paramValue)
+        {
+            if (paramValue < 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName, $"{paramName} cannot be negative"); 
+            }
+        }
+
         public Customer UpdateCustomer(Customer customerUpdate)
         {
             if (FindCustomerById(customerUpdate.CustomerID) is null)

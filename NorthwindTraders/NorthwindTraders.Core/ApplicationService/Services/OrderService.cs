@@ -31,7 +31,6 @@ namespace NorthwindTraders.Core.ApplicationService.Services
                               string shipCountry,
                               Employee employee)
         {
-            RaiseIfLessThanOne("Order ID", id);
             RaiseIfDateTooOld("Order Date", orderDate, string.Empty, new DateTime(1996, 1, 1));
             RaiseIfDateInTheFuture("Order Date", orderDate);
             RaiseIfNull(customer);
@@ -67,6 +66,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
 
         public Order CreateOrder(Order order)
         {
+            RaiseIfNegative("Order ID", order.OrderId);
             Order newOrder = NewOrder(
                 order.OrderId,
                 order.OrderDate,
@@ -103,6 +103,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
 
         public Order UpdateOrder(Order orderUpdate)
         {
+            RaiseIfLessThanOne("Order ID", orderUpdate.OrderId);
             if (FindOrderById(orderUpdate.OrderId) is null)
             {
                 throw new NotFoundException($"Order ID: {orderUpdate.OrderId} not found to update");
@@ -194,6 +195,14 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             if (paramValue < 1)
             {
                 throw new ArgumentOutOfRangeException(paramName, $"{paramName} cannot be less than 1");
+            }
+        }
+
+        private void RaiseIfNegative(string paramName, int paramValue)
+        {
+            if (paramValue > 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName, $"{paramName} cannot be negative");
             }
         }
     }

@@ -70,6 +70,10 @@ namespace NorthwindTraders.RESTApi.Controllers
             {
                 createdOrder = _orderService.CreateOrder(order);
             }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
             catch (System.Exception ex)
             {
                 return BadRequest(ex.Message);

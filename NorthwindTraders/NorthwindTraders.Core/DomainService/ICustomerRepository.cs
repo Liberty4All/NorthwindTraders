@@ -11,5 +11,7 @@ namespace NorthwindTraders.Core.DomainService
         Customer Update(Customer customerUpdate);
         Customer Delete(string customerId);
         Customer ReadByIdIncludeOrders(string customerId);
+        IEnumerable<Customer> ReadAll(Filter filter = null);
+        int Count();
     }
 }

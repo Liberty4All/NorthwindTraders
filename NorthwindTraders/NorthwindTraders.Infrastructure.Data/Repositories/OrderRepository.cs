@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NorthwindTraders.Core;
 using NorthwindTraders.Core.DomainService;
 using NorthwindTraders.Core.Entity;
 using System;
@@ -22,7 +23,12 @@ namespace NorthwindTraders.Infrastructure.Data.Repositories
                 _context.ChangeTracker.Entries<Customer>()
                 .FirstOrDefault(ce => ce.Entity.CustomerID == order.Customer.CustomerID) == null)
             {
-                _context.Attach(order.Customer); 
+                _context.Attach(order.Customer);
+            }
+            var customer = _context.Customers.Where(c => c.CustomerID == order.Customer.CustomerID).FirstOrDefault();
+            if (customer is null)
+            {
+                throw new NotFoundException($"Customer ID: '{order.Customer.CustomerID}' cannot be found");
             }
             var saved = _context.Orders.Add(order).Entity;
             _context.SaveChanges();
@@ -49,9 +55,17 @@ namespace NorthwindTraders.Infrastructure.Data.Repositories
             {
                 _context.Attach(orderUpdate.Customer);
             }
+            else
+            {
+                _context.Entry(orderUpdate).Reference(o => o.Customer).IsModified = true;
+            }
             var updated = _context.Update(orderUpdate).Entity;
             _context.SaveChanges();
             return updated;
+            //_context.Attach(orderUpdate).State = EntityState.Modified;
+            //_context.Entry(orderUpdate).Reference(o => o.Customer).IsModified = true;
+            //_context.SaveChanges();
+            //return orderUpdate;
         }
 
         public Order Delete(int orderId)

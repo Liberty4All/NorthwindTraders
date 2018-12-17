@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthwindTraders.Core", "NorthwindTraders.Core\NorthwindTraders.Core.csproj", "{5215207E-E5D8-4DE6-9959-3B6BFAB07263}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NorthwindTraders.Core", "NorthwindTraders.Core\NorthwindTraders.Core.csproj", "{5215207E-E5D8-4DE6-9959-3B6BFAB07263}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthwindTraders.Tests", "NorthwindTraders.Tests\NorthwindTraders.Tests.csproj", "{65B72D2C-9689-4A8F-8BD2-265603AC8FA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NorthwindTraders.Tests", "NorthwindTraders.Tests\NorthwindTraders.Tests.csproj", "{65B72D2C-9689-4A8F-8BD2-265603AC8FA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthwindTraders.Core.Entity", "NorthwindTraders.Core.Entity\NorthwindTraders.Core.Entity.csproj", "{F6DD4144-BFD9-4F16-B2E9-A3409CF07D76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NorthwindTraders.Core.Entity", "NorthwindTraders.Core.Entity\NorthwindTraders.Core.Entity.csproj", "{F6DD4144-BFD9-4F16-B2E9-A3409CF07D76}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{84EF2939-BD07-424F-9410-AB535B029807}"
 EndProject
@@ -15,9 +15,30 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{1CBF7FB7-6BE3-4519-A30E-AFD3E15CCF0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthwindTraders.RESTApi", "NorthwindTraders.RESTApi\NorthwindTraders.RESTApi.csproj", "{DC278E29-2C46-4FE6-83EE-80C22BBDE27C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NorthwindTraders.RESTApi", "NorthwindTraders.RESTApi\NorthwindTraders.RESTApi.csproj", "{DC278E29-2C46-4FE6-83EE-80C22BBDE27C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthwindTraders.Infrastructure.Data", "NorthwindTraders.Infrastructure.Data\NorthwindTraders.Infrastructure.Data.csproj", "{5E08CE0A-7DBE-47DE-97F6-0E3A7D3C9674}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NorthwindTraders.Infrastructure.Data", "NorthwindTraders.Infrastructure.Data\NorthwindTraders.Infrastructure.Data.csproj", "{5E08CE0A-7DBE-47DE-97F6-0E3A7D3C9674}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "app", "NorthwindTraders-Website\src\app\", "{331B6CE4-A62F-429B-A9D6-4E707183C1C7}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_30843"
+		Debug.AspNetCompiler.PhysicalPath = "NorthwindTraders-Website\src\app\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_30843\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_30843"
+		Release.AspNetCompiler.PhysicalPath = "NorthwindTraders-Website\src\app\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_30843\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "30843"
+		SlnRelativePath = "NorthwindTraders-Website\src\app\"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +66,10 @@ Global
 		{5E08CE0A-7DBE-47DE-97F6-0E3A7D3C9674}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E08CE0A-7DBE-47DE-97F6-0E3A7D3C9674}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E08CE0A-7DBE-47DE-97F6-0E3A7D3C9674}.Release|Any CPU.Build.0 = Release|Any CPU
+		{331B6CE4-A62F-429B-A9D6-4E707183C1C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{331B6CE4-A62F-429B-A9D6-4E707183C1C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{331B6CE4-A62F-429B-A9D6-4E707183C1C7}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{331B6CE4-A62F-429B-A9D6-4E707183C1C7}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +79,7 @@ Global
 		{F6DD4144-BFD9-4F16-B2E9-A3409CF07D76} = {84EF2939-BD07-424F-9410-AB535B029807}
 		{DC278E29-2C46-4FE6-83EE-80C22BBDE27C} = {1CBF7FB7-6BE3-4519-A30E-AFD3E15CCF0F}
 		{5E08CE0A-7DBE-47DE-97F6-0E3A7D3C9674} = {0452C037-4F61-4293-B4FC-436D14A2D86F}
+		{331B6CE4-A62F-429B-A9D6-4E707183C1C7} = {1CBF7FB7-6BE3-4519-A30E-AFD3E15CCF0F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E9780A11-375B-4DC1-ABED-D9286ACA1571}

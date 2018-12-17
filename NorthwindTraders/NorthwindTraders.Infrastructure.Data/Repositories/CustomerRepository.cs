@@ -63,5 +63,21 @@ namespace NorthwindTraders.Infrastructure.Data.Repositories
             _context.SaveChanges();
             return custRemoved;
         }
+
+        public IEnumerable<Customer> ReadAll(Filter filter)
+        {
+            if (filter is null)
+            {
+                return _context.Customers;
+            }
+            return _context.Customers
+                .Skip((filter.CurrentPage - 1) * filter.ItemsPerPage)
+                .Take(filter.ItemsPerPage);
+        }
+
+        public int Count()
+        {
+            return _context.Customers.Count();
+        }
     }
 }

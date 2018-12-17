@@ -21,6 +21,7 @@ namespace NorthwindTraders.Core.ApplicationService
         Customer CreateCustomer(Customer cust);
         Customer FindCustomerById(string customerId);
         Customer FindCustomerByIdIncludingOrders(string customerId);
+        List<Customer> GetFilteredCustomers(Filter filter);
         List<Customer> GetAllCustomers();
         Customer UpdateCustomer(Customer customerUpdate);
         Customer DeleteCustomer(string id);

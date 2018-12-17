@@ -22,22 +22,22 @@ namespace NorthwindTraders.RESTApi.Controllers
 
         // GET api/customers
         [HttpGet]
-        public ActionResult<IEnumerable<Customer>> Get()
+        public ActionResult<IEnumerable<Customer>> Get([FromQuery] Filter filter)
         {
             List<Customer> fetchCustomers;
             try
             {
-                fetchCustomers = _customerService.GetAllCustomers();
+                fetchCustomers = _customerService.GetFilteredCustomers(filter);
                 if (fetchCustomers is null)
                 {
                     return NoContent();
                 }
+            return Ok(fetchCustomers);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            return fetchCustomers;
         }
 
         // GET api/customers/KEENE
