@@ -15,21 +15,4 @@ export class CustomerListComponent implements OnInit {
   ngOnInit() {
     this.customers = this.customerService.getCustomers();
   }
-
-  addACustomer() {
-    const customer: Customer = {
-      id: 5,
-      companyName: 'New Corp',
-      contactName: 'New Contact',
-      contactTitle: '',
-      address: '321 Jump St',
-      city: 'Boston',
-      region: 'MA',
-      postalCode: '11223',
-      country: 'US',
-      phone: '1-433-997-5647',
-      fax: ''
-    };
-    this.customerService.addCustomer(customer);
-  }
 }

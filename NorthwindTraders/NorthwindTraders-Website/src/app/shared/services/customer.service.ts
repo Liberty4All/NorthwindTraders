@@ -8,7 +8,7 @@ export class CustomerService {
   customers: Customer[];
 
   constructor() {
-    this.customers = [{id: 1,
+    this.customers = [{id: 'FOOBR',
       companyName: 'Fooberts Candies',
       contactName: 'John Foobert',
       contactTitle: 'CEO',
@@ -19,7 +19,7 @@ export class CustomerService {
       country: 'UK',
       phone: '433-33-5647',
       fax: ''},
-      {id: 2,
+      {id: 'WWCFA',
         companyName: 'Willy Wonka\'s Candy Factory',
         contactName: 'Willy Wonka',
         contactTitle: 'Chief of Dreams',
@@ -38,5 +38,10 @@ export class CustomerService {
 
   addCustomer(customer: Customer) {
     this.customers.push(customer);
+  }
+
+  getCustomerById(id: string): Customer {
+    const customer = this.customers.find(cust => cust.id === id);
+    return customer;
   }
 }

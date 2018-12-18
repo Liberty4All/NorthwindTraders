@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Customer } from '../../shared/models/customer';
+import { CustomerService } from '../../shared/services/customer.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-customer-details',
@@ -8,22 +10,17 @@ import { Customer } from '../../shared/models/customer';
 })
 export class CustomerDetailsComponent implements OnInit {
   customer: Customer;
-  constructor() { }
+  constructor(
+    private route: ActivatedRoute,
+    private customerService: CustomerService
+  ) { }
 
-  ngOnInit() {
-    this.customer = {
-      id: 20,
-      companyName: 'Sweety\'s Sweets',
-      contactName: 'Sweety McSweet',
-      contactTitle: 'Owner',
-      address: '678 Cherry Lane',
-      city: 'Denver',
-      region: 'CO',
-      country: 'US',
-      postalCode: '77777',
-      phone: '876-555-1212',
-      fax: ''
-    };
+  ngOnInit(): void {
+    this.getCustomer();
   }
 
+  getCustomer(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    this.customer = this.customerService.getCustomerById(id);
+  }
 }

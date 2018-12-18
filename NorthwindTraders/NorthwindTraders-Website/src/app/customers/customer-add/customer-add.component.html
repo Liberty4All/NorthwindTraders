@@ -1,0 +1,37 @@
+<button routerLink="/customers">Back</button>
+<form [formGroup]="customerForm" (ngSubmit)="save()">
+  <label>ID:
+    <input type="text" formControlName="id">
+  </label>
+  <label>Company Name:
+    <input type="text" formControlName="companyName">
+  </label>
+  <label>Contact Name:
+    <input type="text" formControlName="contactName">
+  </label>
+  <label>Contact Title:
+    <input type="text" formControlName="contactTitle">
+  </label>
+  <label>Address:
+    <input type="text" formControlName="address">
+  </label>
+  <label>City:
+    <input type="text" formControlName="city">
+  </label>
+  <label>Region:
+    <input type="text" formControlName="region">
+  </label>
+  <label>Postal Code:
+    <input type="text" formControlName="postalCode">
+  </label>
+  <label>Country:
+    <input type="text" formControlName="country">
+  </label>
+  <label>Phone:
+    <input type="text" formControlName="phone">
+  </label>
+  <label>Fax:
+    <input type="text" formControlName="fax">
+  </label>
+  <button type="submit">Save</button>
+</form>
