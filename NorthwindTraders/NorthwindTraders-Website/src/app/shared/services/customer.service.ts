@@ -18,7 +18,18 @@ export class CustomerService {
       postalCode: '012-4356',
       country: 'UK',
       phone: '433-33-5647',
-      fax: ''}];
+      fax: ''},
+      {id: 2,
+        companyName: 'Willy Wonka\'s Candy Factory',
+        contactName: 'Willy Wonka',
+        contactTitle: 'Chief of Dreams',
+        address: '321 Magical St',
+        city: 'Wonka City',
+        region: 'Birmingham',
+        postalCode: '333-33-3333',
+        country: 'WL',
+        phone: '222-333-5555',
+        fax: ''}];
    }
 
   getCustomers(): Customer[] {
