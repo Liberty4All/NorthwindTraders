@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Customer } from '../../shared/models/customer';
+import { CustomerService } from '../../shared/services/customer.service';
 
 @Component({
   selector: 'app-customer-list',
@@ -7,27 +8,16 @@ import { Customer } from '../../shared/models/customer';
   styleUrls: ['./customer-list.component.scss']
 })
 export class CustomerListComponent implements OnInit {
-
   customers: Customer[];
 
-  constructor() { }
+  constructor(private customerService: CustomerService) { }
 
   ngOnInit() {
-    this.customers = [{id: 1,
-      companyName: 'Fooberts Candies',
-      contactName: 'John Foobert',
-      contactTitle: 'CEO',
-      address: '123 Somewhere St',
-      city: 'London',
-      region: 'Manchester',
-      postalCode: '012-4356',
-      country: 'UK',
-      phone: '433-33-5647',
-      fax: ''}];
+    this.customers = this.customerService.getCustomers();
   }
 
-  countUpOne() {
-    this.customers.push({
+  addACustomer() {
+    const customer: Customer = {
       id: 5,
       companyName: 'New Corp',
       contactName: 'New Contact',
@@ -39,6 +29,7 @@ export class CustomerListComponent implements OnInit {
       country: 'US',
       phone: '1-433-997-5647',
       fax: ''
-    });
+    };
+    this.customerService.addCustomer(customer);
   }
 }

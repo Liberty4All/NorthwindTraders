@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { CustomerListComponent } from './customers/customer-list/customer-list.component';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { WelcomeComponent } from './welcome/welcome.component';
     WelcomeComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
