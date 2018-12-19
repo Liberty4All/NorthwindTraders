@@ -44,4 +44,14 @@ export class CustomerService {
     const customer = this.customers.find(cust => cust.id === id);
     return customer;
   }
+
+  updateCustomer(customer: Customer) {
+    const custToUpdate = this.customers.find(cust => customer.id === cust.id);
+    const index = this.customers.indexOf(custToUpdate);
+    this.customers[index] = customer;
+  }
+
+  deleteCustomer(id: string) {
+    this.customers = this.customers.filter(cust => cust.id !== id);
+  }
 }
