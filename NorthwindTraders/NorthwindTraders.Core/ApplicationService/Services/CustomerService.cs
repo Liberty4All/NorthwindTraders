@@ -108,7 +108,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             Customer fetchCustomer = _customerRepository.ReadById(customerId);
             if (fetchCustomer is null)
             {
-                throw new NotFoundException($"Could not find Customer ID: {customerId}");
+                throw new NotFoundException($"Could not find Customer ID: '{customerId}'");
             }
             return fetchCustomer;
         }
@@ -150,23 +150,19 @@ namespace NorthwindTraders.Core.ApplicationService.Services
 
         public Customer UpdateCustomer(Customer customerUpdate)
         {
-            if (FindCustomerById(customerUpdate.CustomerID) is null)
-            {
-                throw new ArgumentException($"Customer ID '{customerUpdate.CustomerID}' not found to update","CustomerID");
-            }
+            Customer customer = FindCustomerById(customerUpdate.CustomerID);
 
-            Customer customer = NewCustomer(
-                customerUpdate.CustomerID,
-                customerUpdate.CompanyName,
-                customerUpdate.ContactName,
-                customerUpdate.ContactTitle,
-                customerUpdate.Address,
-                customerUpdate.City,
-                customerUpdate.Region,
-                customerUpdate.PostalCode,
-                customerUpdate.Country,
-                customerUpdate.Phone,
-                customerUpdate.Fax);
+            customer.CustomerID = customerUpdate.CustomerID;
+            customer.CompanyName = customerUpdate.CompanyName;
+            customer.ContactName = customerUpdate.ContactName;
+            customer.ContactTitle = customerUpdate.ContactTitle;
+            customer.Address = customerUpdate.Address;
+            customer.City = customerUpdate.City;
+            customer.Region = customerUpdate.Region;
+            customer.PostalCode = customerUpdate.PostalCode;
+            customer.Country = customerUpdate.Country;
+            customer.Phone = customerUpdate.Phone;
+            customer.Fax = customerUpdate.Fax;
             return _customerRepository.Update(customer);
         }
 

@@ -3,6 +3,7 @@ using FluentAssertions.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NorthwindTraders.Core;
 using NorthwindTraders.Core.ApplicationService.Services;
 using NorthwindTraders.Core.DomainService;
 using NorthwindTraders.Core.Entity;
@@ -22,7 +23,7 @@ namespace NorthwindTraders.Tests
         public DateTime requiredDate;
         public DateTime shippedDate;
         public Shipper shipper;
-        public double freight;
+        public decimal freight;
         public string shipName;
         public string shipAddress;
         public string shipCity;
@@ -55,7 +56,7 @@ namespace NorthwindTraders.Tests
             requiredDate = orderDate.AddDays(14);
             shippedDate = orderDate.AddDays(3);
             shipper = new Shipper();
-            freight = 12.5;
+            freight = 12.5M;
             shipName = "Bubba Express";
             shipAddress = "123 Ship Street";
             shipCity = "Ship City";
@@ -74,13 +75,13 @@ namespace NorthwindTraders.Tests
             Initialize();
 
             // Act
-            var result = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            var result = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Customer.Should().BeEquivalentTo(customer);
             result.Employee.Should().BeEquivalentTo(employee);
             result.Freight.Should().Be(freight);
-            result.Id.Should().Be(Id);
+            result.OrderId.Should().Be(Id);
             result.OrderDate.Should().Be(orderDate);
             result.RequiredDate.Should().Be(requiredDate);
             result.ShipAddress.Should().Be(shipAddress);
@@ -88,7 +89,7 @@ namespace NorthwindTraders.Tests
             result.ShipCountry.Should().Be(shipCountry);
             result.ShipName.Should().Be(shipName);
             result.ShippedDate.Should().Be(shippedDate);
-            result.Shipper.Should().BeEquivalentTo(shipper);
+            result.ShipVia.Should().Be(shipper.Id);
             result.ShipPostalCode.Should().Be(shipPostalCode);
             result.ShipRegion.Should().Be(shipRegion);
         }
@@ -102,10 +103,10 @@ namespace NorthwindTraders.Tests
             Id = -1;
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
-            result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Order ID cannot be less than 0\nParameter name: Order ID");
+            result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Order ID cannot be negative\nParameter name: Order ID");
         }
 
         [TestMethod]
@@ -117,7 +118,7 @@ namespace NorthwindTraders.Tests
             orderDate = 31.December(1995);
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Order Date cannot be before January 1, 1996\nParameter name: Order Date");
@@ -132,7 +133,7 @@ namespace NorthwindTraders.Tests
             orderDate = DateTime.Now.Date.AddDays(5);
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Order Date cannot be in the future\nParameter name: Order Date");
@@ -147,7 +148,7 @@ namespace NorthwindTraders.Tests
             customer = null;
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentNullException>().WithMessage("Customer cannot be null\nParameter name: Order Customer");
@@ -163,7 +164,7 @@ namespace NorthwindTraders.Tests
             string orderDateString = orderDate.ToString("MMMM d, yyyy");
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentOutOfRangeException>().WithMessage($"Required date cannot be before order date of {orderDateString}\nParameter name: Required Date");
@@ -179,7 +180,7 @@ namespace NorthwindTraders.Tests
             string orderDateString = orderDate.ToString("MMMM d, yyyy");
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentOutOfRangeException>().WithMessage($"Shipped date cannot be before order date of {orderDateString}\nParameter name: Shipped Date");
@@ -194,14 +195,14 @@ namespace NorthwindTraders.Tests
             shipName = "12345678901234567890123456789012345678901234567890";
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentException>().WithMessage("Ship name must be no more than 40 characters in length\nParameter name: Ship Name");
         }
 
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Unit")]
         public void NewOrder_ShipAddressTooLong_ThrowInvalidArgumentError()
         {
             // Arrange
@@ -209,7 +210,7 @@ namespace NorthwindTraders.Tests
             shipAddress = "1234567890123456789012345678901234567890123456789012345678901234567890";
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentException>().WithMessage("Ship address must be no more than 60 characters in length\nParameter name: Ship Address");
@@ -224,7 +225,7 @@ namespace NorthwindTraders.Tests
             shipCity = "12345678901234567890";
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentException>().WithMessage("Ship city must be no more than 15 characters in length\nParameter name: Ship City");
@@ -239,7 +240,7 @@ namespace NorthwindTraders.Tests
             shipRegion = "12345678901234567890";
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentException>().WithMessage("Ship region must be no more than 15 characters in length\nParameter name: Ship Region");
@@ -254,7 +255,7 @@ namespace NorthwindTraders.Tests
             shipPostalCode = "12345678901234567890";
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Ship postal code must be no more than 10 characters in length\nParameter name: Ship Postal Code");
@@ -269,7 +270,7 @@ namespace NorthwindTraders.Tests
             shipCountry = "12345678901234567890";
 
             // Act
-            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Action result = () => orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
 
             // Assert
             result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Ship country must be no more than 15 characters in length\nParameter name: Ship Country");
@@ -283,7 +284,7 @@ namespace NorthwindTraders.Tests
         {
             // Arrange
             Initialize();
-            Order Order = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Order Order = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
             orderRepository.Setup(m => m.Create(It.IsAny<Order>())).Returns(Order);
 
             // Act
@@ -302,11 +303,11 @@ namespace NorthwindTraders.Tests
         {
             // Arrange
             Initialize();
-            Order order = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Order order = orderService.NewOrder(Id = 1, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
             orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns(order);
 
             // Act
-            var result = orderService.FindOrderById(order.Id);
+            var result = orderService.FindOrderById(order.OrderId);
 
             // Assert
             result.Should().NotBeNull();
@@ -319,14 +320,12 @@ namespace NorthwindTraders.Tests
         {
             // Arrange
             Initialize();
-            Order order = null;
-            orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns(order);
 
             // Act
-            var result = orderService.FindOrderById(9999);
+            Action result = () => orderService.FindOrderById(9999);
 
             // Assert
-            result.Should().BeNull();
+            result.Should().Throw<NotFoundException>().WithMessage("Could not find Order ID: '9999'");
         }
 
         [TestMethod]
@@ -340,7 +339,7 @@ namespace NorthwindTraders.Tests
             Action result = () => orderService.FindOrderById(-1);
 
             // Assert
-            result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Order ID cannot be less than 0\nParameter name: Order ID");
+            result.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Order ID cannot be less than 1\nParameter name: Order ID");
         }
         #endregion
 
@@ -358,7 +357,7 @@ namespace NorthwindTraders.Tests
                     Customer = customer,
                     Employee = employee,
                     Freight = freight,
-                    Id = 1,
+                    OrderId = 1,
                     OrderDate = orderDate,
                     RequiredDate = requiredDate,
                     ShipAddress = shipAddress,
@@ -366,7 +365,7 @@ namespace NorthwindTraders.Tests
                     ShipCountry = shipCountry,
                     ShipName = shipName,
                     ShippedDate = shippedDate,
-                    Shipper = shipper,
+                    ShipVia = shipper.Id,
                     ShipPostalCode = shipPostalCode,
                     ShipRegion = shipRegion
                 },
@@ -375,7 +374,7 @@ namespace NorthwindTraders.Tests
                     Customer = customer,
                     Employee = employee,
                     Freight = freight,
-                    Id = 2,
+                    OrderId = 2,
                     OrderDate = orderDate,
                     RequiredDate = requiredDate,
                     ShipAddress = shipAddress,
@@ -383,7 +382,7 @@ namespace NorthwindTraders.Tests
                     ShipCountry = shipCountry,
                     ShipName = shipName,
                     ShippedDate = shippedDate,
-                    Shipper = shipper,
+                    ShipVia = shipper.Id,
                     ShipPostalCode = shipPostalCode,
                     ShipRegion = shipRegion
 
@@ -424,7 +423,7 @@ namespace NorthwindTraders.Tests
         {
             // Arrange
             Initialize();
-            Order updateOrder = orderService.NewOrder(9999, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Order updateOrder = orderService.NewOrder(9999, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
             orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns(updateOrder);
             orderRepository.Setup(m => m.Update(It.IsAny<Order>())).Returns(updateOrder);
 
@@ -445,14 +444,14 @@ namespace NorthwindTraders.Tests
             // Arrange
             Initialize();
             Id = 99;
-            Order updateOrder = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Order updateOrder = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
             orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns((Order)null);
 
             // Act
             Action result = () => orderService.UpdateOrder(updateOrder);
 
             // Assert
-            result.Should().Throw<Exception>().WithMessage($"Order ID '{Id}' not found to update");
+            result.Should().Throw<Exception>().WithMessage($"Could not find Order ID: '{Id}'");
             orderRepository.Verify(m => m.ReadById(It.IsAny<int>()), Times.Once);
             orderRepository.Verify(m => m.Update(It.IsAny<Order>()), Times.Never);
         }
@@ -463,7 +462,7 @@ namespace NorthwindTraders.Tests
         {
             // Arrange
             Initialize();
-            Order updateOrder = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
+            Order updateOrder = orderService.NewOrder(Id, orderDate, customer, requiredDate, shippedDate, shipper.Id, freight, shipName, shipAddress, shipCity, shipRegion, shipPostalCode, shipCountry, employee);
             orderRepository.Setup(m => m.ReadById(It.IsAny<int>())).Returns((Order)null);
 
             // Act

@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NorthwindTraders.Core;
 using NorthwindTraders.Core.ApplicationService.Services;
 using NorthwindTraders.Core.DomainService;
 using NorthwindTraders.Core.Entity;
@@ -308,18 +309,16 @@ namespace NorthwindTraders.Tests
 
         [TestMethod]
         [TestCategory("Unit")]
-        public void FindById_NonExistentCustomerId_NullCustomer()
+        public void FindById_NonExistentCustomerId_NotFoundCustomerException()
         {
             // Arrange
             Initialize();
-            Customer customer = null;
-            customerRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(customer);
 
             // Act
-            var result = customerService.FindCustomerById("NOPE!");
+            Action result = () => customerService.FindCustomerById("NOPE!");
 
             // Assert
-            result.Should().BeNull();
+            result.Should().Throw<NotFoundException>().WithMessage("Could not find Customer ID: 'NOPE!'");
         }
 
         [TestMethod]
@@ -337,7 +336,7 @@ namespace NorthwindTraders.Tests
         }
 
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Unit")]
         public void FindByIdIncludeOrders_ValidCustomer_CustomerWithOrders()
         {
             // Arrange
@@ -349,7 +348,7 @@ namespace NorthwindTraders.Tests
                 customer,
                 DateTime.Now.AddDays(10),
                 DateTime.Now,
-                shipper,
+                shipper.Id,
                 (decimal)15.65,
                 customer.CompanyName,
                 customer.Address,
@@ -361,7 +360,7 @@ namespace NorthwindTraders.Tests
             List<Order> orders = new List<Order>();
             orders.Add(order);
             customer.Orders = orders;
-            customerRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(customer);
+            customerRepository.Setup(m => m.ReadByIdIncludeOrders(It.IsAny<string>())).Returns(customer);
             orderRepository.Setup(m => m.ReadAll()).Returns(orders);
 
             // Act
@@ -473,7 +472,7 @@ namespace NorthwindTraders.Tests
             Action result = () => customerService.UpdateCustomer(updateCustomer);
 
             // Assert
-            result.Should().Throw<Exception>().WithMessage("Customer ID 'TESTC' not found to update");
+            result.Should().Throw<NotFoundException>().WithMessage("Could not find Customer ID: 'TESTC'");
             customerRepository.Verify(m => m.ReadById(It.IsAny<string>()), Times.Once);
             customerRepository.Verify(m => m.Update(It.IsAny<Customer>()), Times.Never);
         }
@@ -481,13 +480,14 @@ namespace NorthwindTraders.Tests
 
         #region DeleteCustomer Tests
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Unit")]
         public void DeleteCustomer_ValidCustomerID_CorrectCustomerReturned()
         {
             // Arrange
             Initialize();
             Customer deleteCustomer = customerService.NewCustomer(customerID, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
             customerRepository.Setup(m => m.Delete(It.IsAny<string>())).Returns(deleteCustomer);
+            customerRepository.Setup(m => m.ReadById(It.IsAny<string>())).Returns(deleteCustomer);
 
             // Act
             var result = customerService.DeleteCustomer(deleteCustomer.CustomerID);
@@ -509,7 +509,7 @@ namespace NorthwindTraders.Tests
             Action result = () => customerService.DeleteCustomer(null);
 
             // Assert
-            result.Should().Throw<ArgumentException>().WithMessage("Customer ID for delete cannot be null, empty, or whitespace\nParameter name: Customer ID");
+            result.Should().Throw<ArgumentException>().WithMessage("Customer ID cannot be null, empty, or whitespace\nParameter name: Customer ID");
             customerRepository.Verify(m => m.Delete(It.IsAny<string>()), Times.Never);
         }
         #endregion

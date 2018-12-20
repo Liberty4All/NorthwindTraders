@@ -31,6 +31,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
                               string shipCountry,
                               Employee employee)
         {
+            RaiseIfNegative("Order ID", id);
             RaiseIfDateTooOld("Order Date", orderDate, string.Empty, new DateTime(1996, 1, 1));
             RaiseIfDateInTheFuture("Order Date", orderDate);
             RaiseIfNull(customer);
@@ -57,7 +58,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
                 ShipCountry = shipCountry,
                 ShipName = shipName,
                 ShippedDate = shippedDate,
-                ShipVia = 1,
+                ShipVia = shipVia,
                 ShipPostalCode = shipPostalCode,
                 ShipRegion = shipRegion
             };
@@ -91,7 +92,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
             Order fetchOrder = _orderRepository.ReadById(orderId);
             if (fetchOrder == null)
             {
-                throw new NotFoundException($"Could not find Order ID: {orderId}");
+                throw new NotFoundException($"Could not find Order ID: '{orderId}'");
             }
             return fetchOrder;
         }
@@ -104,26 +105,22 @@ namespace NorthwindTraders.Core.ApplicationService.Services
         public Order UpdateOrder(Order orderUpdate)
         {
             RaiseIfLessThanOne("Order ID", orderUpdate.OrderId);
-            if (FindOrderById(orderUpdate.OrderId) is null)
-            {
-                throw new NotFoundException($"Order ID: {orderUpdate.OrderId} not found to update");
-            }
+            Order order = FindOrderById(orderUpdate.OrderId);
 
-            Order order = NewOrder(
-                orderUpdate.OrderId,
-                orderUpdate.OrderDate,
-                orderUpdate.Customer,
-                orderUpdate.RequiredDate,
-                orderUpdate.ShippedDate.GetValueOrDefault(DateTime.MinValue),
-                orderUpdate.ShipVia,
-                orderUpdate.Freight,
-                orderUpdate.ShipName,
-                orderUpdate.ShipAddress,
-                orderUpdate.ShipCity,
-                orderUpdate.ShipRegion,
-                orderUpdate.ShipPostalCode,
-                orderUpdate.ShipCountry,
-                orderUpdate.Employee);
+            order.OrderId = orderUpdate.OrderId;
+            order.OrderDate = orderUpdate.OrderDate;
+            order.Customer = orderUpdate.Customer;
+            order.RequiredDate = orderUpdate.RequiredDate;
+            order.ShippedDate = orderUpdate.ShippedDate.GetValueOrDefault(DateTime.MinValue);
+            order.ShipVia = orderUpdate.ShipVia;
+            order.Freight = orderUpdate.Freight;
+            order.ShipName = orderUpdate.ShipName;
+            order.ShipAddress = orderUpdate.ShipAddress;
+            order.ShipCity = orderUpdate.ShipCity;
+            order.ShipRegion = orderUpdate.ShipRegion;
+            order.ShipPostalCode = orderUpdate.ShipPostalCode;
+            order.ShipCountry = orderUpdate.ShipCountry;
+            order.Employee = orderUpdate.Employee;
             return _orderRepository.Update(orderUpdate);
         }
 
@@ -200,7 +197,7 @@ namespace NorthwindTraders.Core.ApplicationService.Services
 
         private void RaiseIfNegative(string paramName, int paramValue)
         {
-            if (paramValue > 0)
+            if (paramValue < 0)
             {
                 throw new ArgumentOutOfRangeException(paramName, $"{paramName} cannot be negative");
             }

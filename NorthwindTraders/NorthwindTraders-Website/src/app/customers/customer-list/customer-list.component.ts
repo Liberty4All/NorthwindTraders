@@ -13,11 +13,15 @@ export class CustomerListComponent implements OnInit {
   constructor(private customerService: CustomerService) { }
 
   ngOnInit() {
-    this.customers = this.customerService.getCustomers();
+    this.customerService.getCustomers()
+      .subscribe(listOfCustomers => {
+        this.customers = listOfCustomers;
+      }
+    );
   }
 
   delete(id: string) {
     this.customerService.deleteCustomer(id);
-    this.customers = this.customerService.getCustomers();
+    // this.customers = this.customerService.getCustomers();
   }
 }
